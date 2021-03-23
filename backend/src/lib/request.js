@@ -2,9 +2,9 @@ import https from 'https'
 import credentials from '../credentials.js'
 import qs from 'qs'
 
-// usage requester(path[, querystring], callback)
+// usage: requester(path[, querystring], callback)
 // callback(err, http.ClientRequest)
-export default function requester (path, querystring, cb) {
+export default function request (path, querystring, cb) {
 	
 	if (typeof querystring==='function') {
 		cb = querystring
