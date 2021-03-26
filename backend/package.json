@@ -13,7 +13,8 @@
   "dependencies": {
     "express": "^4.17.1",
     "iconv-lite": "^0.6.2",
-    "mongoose": "^5.12.0"
+    "mongoose": "^5.12.0",
+    "unzip-stream": "^0.3.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.7"

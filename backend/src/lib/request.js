@@ -2,7 +2,7 @@ import https from 'https'
 import credentials from '../credentials.js'
 import qs from 'qs'
 
-// usage: requester(path[, querystring], callback)
+// usage: requester(path: string[, querystring: object], callback)
 // callback(err, http.ClientRequest)
 export default function request (path, querystring, cb) {
 	
