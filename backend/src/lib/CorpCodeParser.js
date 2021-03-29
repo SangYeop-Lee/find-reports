@@ -1,11 +1,13 @@
-
 import { Transform } from 'stream'
+import mongoose from 'mongoose'
+import DataSaver from './DataSaver.js'
 
 class CorpCodeParser extends Transform {
 	constructor() {
-		super({ readableObjectMode: true, writableObjectMode: true })
+		super()
 		this.isStarted = false
 		this.remainder = ''
+		this.Saver = new DataSaver("CorpCode")
 	}
 	
 	_transform(chunk, encoding, callback) {
@@ -16,12 +18,17 @@ class CorpCodeParser extends Transform {
 			corpLists.shift()
 		}
 		this.remainder = corpLists.pop()
-		callback(null, corpLists.map(parseCorpData))
-		// TODO
-		// save in db and drain data
+		const result = corpLists
+			.map(parseCorpData)
+			.filter(data => data.stock_code!==" ")
+		this.Saver.save(result)
+		
+		callback(null)
   }
 	
 	_flush(callback) {
+		this.Saver.close()
+		console.log(`${this.Saver.numUpdates} docs inserted(or updated).`)
 		callback(null)
 	}
 }
