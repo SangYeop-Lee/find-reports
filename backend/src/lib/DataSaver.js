@@ -9,28 +9,17 @@ class DataSaver {
 		this.shouldClose = false
 		this.Model = Model[modelName]
 		if (!this.Model)
-			new Error("wrong model name")
+			throw new Error("wrong model name")
 		
-		this.numUpdates = 0
+		switch (modelName) {
+			case 'CorpCode':
+				this.save = saveCorpCode.bind(this)
+				break
+		}
 		
 		mongoose.connect('mongodb://localhost:27017/', {
 			useNewUrlParser: true,
 			useUnifiedTopology: true
-		})
-	}
-	
-	save(data) {
-		this.numTasks += data.length
-		const that = this
-		// find faster way to insert. (upsert or find && create)
-		data.forEach(datum => {
-			this.Model.updateOne({ "corp_code": datum.corp_code }, datum, { upsert: true }, (err, res) => {
-				if (err) console.log(err)
-				if (--that.numTasks===0 && that.shouldClose) {
-					mongoose.disconnect()
-				}
-				that.numUpdates += res.n + res.nModified
-			})
 		})
 	}
 	
@@ -39,6 +28,24 @@ class DataSaver {
 			mongoose.disconnect()
 		this.shouldClose = true
 	}
+}
+
+function saveCorpCode(data) {
+	this.numTasks ++
+	const that = this
+
+	this.Model.bulkWrite(data.map(datum => ({
+		updateOne: {
+			filter: { corp_code: datum.corp_code },
+			update: datum,
+			upsert: true
+		}
+	}))).then( res => {
+		if (--that.numTasks===0 && that.shouldClose)
+			mongoose.disconnect()
+	}).catch( err => {
+		console.log(err)
+	})
 }
 
 export default DataSaver

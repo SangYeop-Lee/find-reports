@@ -1,1 +1,1 @@
-console.log(DOMParser)
+export default function asdf () {}

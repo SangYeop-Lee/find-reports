@@ -11,7 +11,8 @@ class CorpCodeParser extends Transform {
 	}
 	
 	_transform(chunk, encoding, callback) {
-		const xml = this.remainder + chunk.toString()
+		
+		const xml = this.remainder+chunk.toString()
 		const corpLists = xml.split("<list>")
 		if (!this.isStarted) {
 			this.isStarted = true
@@ -20,7 +21,7 @@ class CorpCodeParser extends Transform {
 		this.remainder = corpLists.pop()
 		const result = corpLists
 			.map(parseCorpData)
-			.filter(data => data.stock_code!==" ")
+			.filter(data => !(new RegExp(/^\s+$/)).test(data.stock_code))
 		this.Saver.save(result)
 		
 		callback(null)
@@ -28,7 +29,6 @@ class CorpCodeParser extends Transform {
 	
 	_flush(callback) {
 		this.Saver.close()
-		console.log(`${this.Saver.numUpdates} docs inserted(or updated).`)
 		callback(null)
 	}
 }
